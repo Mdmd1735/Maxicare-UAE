@@ -760,19 +760,35 @@
         }, { threshold: 0.5 }).observe(statsSection);
     }
 
-    // ── 4. SERVICE CARDS — staggered fade-up (IntersectionObserver) ──────────
-    var cards = document.querySelectorAll('.service-card');
-    var cardObs = new IntersectionObserver(function(entries) {
-        entries.forEach(function(entry) {
-            if (entry.isIntersecting) {
-                var card = entry.target;
-                var idx = Array.from(cards).indexOf(card);
-                setTimeout(function() { card.classList.add('visible'); }, idx * 80);
-                cardObs.unobserve(card);
-            }
+    // ── 4. SERVICE CARDS — 3D tilt + glossy sheen on hover ───────────────────
+    document.querySelectorAll('.service-card').forEach(function(card) {
+        // Inject sheen layer
+        var sheen = document.createElement('div');
+        sheen.className = 'card-sheen';
+        card.appendChild(sheen);
+
+        card.addEventListener('mousemove', function(e) {
+            var rect = card.getBoundingClientRect();
+            var x = (e.clientX - rect.left) / rect.width - 0.5;   // -0.5 → 0.5
+            var y = (e.clientY - rect.top)  / rect.height - 0.5;
+            // Snappy during movement
+            card.style.transition = 'box-shadow 0.08s ease, border-color 0.2s ease';
+            card.style.transform = 'perspective(600px) rotateY(' + (x * 12) + 'deg) rotateX(' + (-y * 12) + 'deg) scale(1.02)';
+            card.style.boxShadow = '0 24px 48px rgba(0,0,0,0.10), ' + (-x * 18) + 'px ' + (-y * 18) + 'px 36px rgba(26,60,94,0.07)';
+            // Sheen follows cursor
+            sheen.style.opacity = '1';
+            sheen.style.background = 'radial-gradient(circle at ' + ((x + 0.5) * 100) + '% ' + ((y + 0.5) * 100) + '%, rgba(255,255,255,0.17) 0%, transparent 58%)';
+        }, { passive: true });
+
+        card.addEventListener('mouseleave', function() {
+            // Smooth return
+            card.style.transition = 'transform 0.38s ease, box-shadow 0.28s ease, border-color 0.2s ease';
+            card.style.transform = '';
+            card.style.boxShadow = '';
+            sheen.style.opacity = '0';
+            setTimeout(function() { card.style.transition = ''; }, 400);
         });
-    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-    cards.forEach(function(c) { cardObs.observe(c); });
+    });
 
     // ── 5. MOBILE MENU ────────────────────────────────────────────────────────
     document.getElementById('nav-toggle').addEventListener('click', function() {
