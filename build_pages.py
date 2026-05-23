@@ -613,11 +613,8 @@ def build_page(s):
     </a>
 
     <nav class="flex items-center justify-between px-6 md:px-8 py-4 max-w-7xl mx-auto w-full">
-        <a href="../index.html" class="flex items-center space-x-3">
-            <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:#1a3c5e">
-                <span class="text-white font-black text-sm tracking-tighter">MC</span>
-            </div>
-            <span class="text-lg font-black tracking-tighter uppercase">Maxi<span class="font-light">Care</span></span>
+        <a href="../index.html" class="flex items-center">
+            <img src="../assets/logo.png" alt="MaxiCare UAE" class="h-10 w-auto" loading="eager">
         </a>
         <div class="hidden md:flex items-center space-x-6 text-xs font-bold uppercase tracking-widest">
             <a href="../index.html#services" class="hover:text-amber-700 transition-colors duration-200">Services</a>

@@ -286,6 +286,21 @@ body {
     margin-bottom: 8px;
 }
 
+/* ── Testimonial cards ──────────────────────────────────────────────────── */
+.testimonial-card {
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.testimonial-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.09);
+}
+
+/* ── Mobile CTA body padding (prevent content hidden behind bar) ─────────── */
+@media (max-width: 767px) {
+    #main-content { padding-bottom: 60px; }
+}
+
 /* ── Preloader ──────────────────────────────────────────────────────────── */
 #preloader {
     position: fixed;
