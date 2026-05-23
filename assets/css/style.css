@@ -286,10 +286,168 @@ body {
     margin-bottom: 8px;
 }
 
+/* ── Preloader ──────────────────────────────────────────────────────────── */
+#preloader {
+    position: fixed;
+    inset: 0;
+    background: white;
+    z-index: 9998;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    transition: opacity 0.55s ease 0.15s, visibility 0.55s ease 0.15s;
+}
+#preloader.done {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+.preloader-mc {
+    width: 64px;
+    height: 64px;
+    border-radius: 18px;
+    background: #1a3c5e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: preloader-breathe 1.1s ease-in-out infinite alternate;
+}
+.preloader-mc span {
+    color: white;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 18px;
+    letter-spacing: -0.04em;
+}
+@keyframes preloader-breathe {
+    from { transform: scale(0.9); opacity: 0.75; }
+    to   { transform: scale(1.05); opacity: 1; }
+}
+.preloader-bar {
+    width: 56px;
+    height: 2px;
+    background: #e5e7eb;
+    border-radius: 2px;
+    overflow: hidden;
+}
+.preloader-bar::after {
+    content: '';
+    display: block;
+    height: 100%;
+    width: 0;
+    background: linear-gradient(to right, #d97706, #1a3c5e);
+    border-radius: 2px;
+    animation: preloader-fill 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes preloader-fill {
+    to { width: 100%; }
+}
+
+/* ── Floating labels ────────────────────────────────────────────────────── */
+.form-field {
+    position: relative;
+}
+.form-field label {
+    position: absolute;
+    left: 1.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #9ca3af;
+    pointer-events: none;
+    transition: top 0.2s ease, font-size 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    line-height: 1;
+    white-space: nowrap;
+}
+.form-field.textarea-field label {
+    top: 1.35rem;
+    transform: none;
+}
+.form-field input:focus ~ label,
+.form-field input:not(:placeholder-shown) ~ label,
+.form-field textarea:focus ~ label,
+.form-field textarea:not(:placeholder-shown) ~ label {
+    top: 0.65rem;
+    font-size: 0.52rem;
+    transform: none;
+    color: #1a3c5e;
+}
+.form-field.select-floated label {
+    top: 0.65rem;
+    font-size: 0.52rem;
+    transform: none;
+    color: #1a3c5e;
+}
+.form-field select:focus ~ label {
+    top: 0.65rem;
+    font-size: 0.52rem;
+    transform: none;
+    color: #1a3c5e;
+}
+.form-fl {
+    padding: 1.65rem 1.25rem 0.65rem !important;
+}
+
+/* ── Submit button morph ────────────────────────────────────────────────── */
+.submit-btn {
+    position: relative;
+    overflow: hidden;
+    transition: background-color 0.45s ease !important;
+}
+.submit-btn.sent {
+    background: #16a34a !important;
+    pointer-events: none;
+}
+.submit-btn .btn-label {
+    display: block;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.submit-btn .btn-tick {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    opacity: 0;
+    transform: scale(0.6);
+    transition: opacity 0.3s ease 0.15s, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s;
+}
+.submit-btn.sent .btn-label {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+.submit-btn.sent .btn-tick {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* ── Coverage pill reveal ───────────────────────────────────────────────── */
+.area-pill {
+    opacity: 0;
+    transform: scale(0.75);
+    transition:
+        opacity  0.35s ease calc(var(--i, 0) * 55ms),
+        transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) calc(var(--i, 0) * 55ms);
+}
+.area-pill.visible {
+    opacity: 1;
+    transform: scale(1);
+}
+
 /* ── Reduced motion ─────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
     .floating-badge, .hero-img, .sectors-track,
     .shimmer-btn::after, .whatsapp-float::before { animation: none; }
     .draw-underline::after { transition: none; }
+    #preloader { transition: none; }
+    .preloader-mc { animation: none; }
+    .preloader-bar::after { animation: none; width: 100%; }
+    .area-pill { opacity: 1; transform: none; transition: none; }
     * { transition-duration: 0.01ms !important; }
 }
