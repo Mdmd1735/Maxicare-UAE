@@ -286,6 +286,20 @@ body {
     margin-bottom: 8px;
 }
 
+/* ── Services grid — center last row ────────────────────────────────────── */
+@media (min-width: 1024px) {
+    .services-grid {
+        display: flex !important;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .services-grid > a {
+        width: calc(33.333% - 1rem);
+        flex-shrink: 0;
+        flex-grow: 0;
+    }
+}
+
 /* ── Testimonial cards ──────────────────────────────────────────────────── */
 .testimonial-card {
     box-shadow: 0 2px 12px rgba(0,0,0,0.04);
