@@ -10,6 +10,19 @@ body {
     --accent: #d97706;
 }
 
+/* ── Scroll progress bar ─────────────────────────────────────────────────── */
+#scroll-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 2px;
+    background: linear-gradient(to right, #d97706, #1a3c5e);
+    z-index: 9999;
+    transition: width 0.1s linear;
+    pointer-events: none;
+}
+
 /* ── Sticky nav ──────────────────────────────────────────────────────────── */
 #site-nav {
     position: sticky;
@@ -58,7 +71,7 @@ body {
     .hero-heading { font-size: clamp(1.5rem, 5vh, 3.75rem); }
 }
 
-/* Ken Burns on hero image */
+/* Ken Burns */
 @keyframes kenburns {
     from { transform: scale(1); }
     to   { transform: scale(1.06); }
@@ -71,33 +84,66 @@ body {
     transform-origin: center center;
 }
 
-/* Hero text reveal — each line clips upward */
+/* Hero text reveal */
 .hero-line-wrap {
     display: block;
     overflow: hidden;
     line-height: 1.05;
 }
-.hero-word {
-    display: block;
-}
+.hero-word { display: block; }
 
 /* ── Floating badge ─────────────────────────────────────────────────────── */
-.floating-badge {
-    animation: rotate 20s linear infinite;
-}
+.floating-badge { animation: rotate 20s linear infinite; }
 
 @keyframes rotate {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
 }
 
-@media (prefers-reduced-motion: reduce) {
-    .floating-badge { animation: none; }
-    .hero-img { animation: none; }
-    * { transition-duration: 0.01ms !important; }
+/* ── CTA shimmer sweep ───────────────────────────────────────────────────── */
+@keyframes shimmer {
+    0%   { background-position: -200% center; }
+    100% { background-position: 200% center; }
+}
+.shimmer-btn {
+    position: relative;
+    overflow: hidden;
+}
+.shimmer-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg, transparent 35%, rgba(255,255,255,0.28) 50%, transparent 65%);
+    background-size: 250% 100%;
+    background-position: -200% center;
+    animation: shimmer 3.8s ease-in-out infinite;
+    pointer-events: none;
+    border-radius: inherit;
 }
 
-/* ── WhatsApp float ─────────────────────────────────────────────────────── */
+/* ── Section heading underline draw ─────────────────────────────────────── */
+.draw-underline {
+    position: relative;
+    display: inline-block;
+}
+.draw-underline::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    height: 3px;
+    width: 0;
+    background: #d97706;
+    border-radius: 2px;
+    transition: width 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.draw-underline.visible::after { width: 56px; }
+
+/* ── WhatsApp sonar pulse ────────────────────────────────────────────────── */
+@keyframes sonar {
+    0%   { transform: scale(1); opacity: 0.55; }
+    100% { transform: scale(1.9); opacity: 0; }
+}
 .whatsapp-float {
     position: fixed;
     bottom: 30px;
@@ -114,6 +160,15 @@ body {
     box-shadow: 0 4px 20px rgba(0,0,0,0.3);
     z-index: 100;
     transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.whatsapp-float::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: #25d366;
+    animation: sonar 2.5s ease-out infinite;
+    z-index: -1;
 }
 .whatsapp-float:hover { transform: scale(1.1) rotate(5deg); }
 .whatsapp-float:focus-visible { outline: 3px solid #25d366; outline-offset: 4px; }
@@ -132,7 +187,6 @@ body {
 .service-card:hover .service-icon { background-color: #1a3c5e; }
 .service-card:hover .service-icon i { color: white; }
 
-/* Glossy sheen overlay */
 .card-sheen {
     position: absolute;
     inset: 0;
@@ -142,8 +196,81 @@ body {
     z-index: 1;
     transition: opacity 0.25s ease;
 }
-/* Keep card content above sheen */
 .service-card > *:not(.card-sheen) { position: relative; z-index: 2; }
+
+/* ── Why Us cards — animated gradient border on hover ───────────────────── */
+.why-card {
+    position: relative;
+    border-radius: 20px;
+    background: #f9fafb; /* matches bg-gray-50 parent */
+    z-index: 0;
+    transition: transform 0.25s ease;
+}
+.why-card::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 22px;
+    background: linear-gradient(135deg, #d97706, #1a3c5e, #d97706, #1a3c5e);
+    background-size: 300% 300%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+    animation: grad-border 3s ease infinite;
+}
+.why-card:hover::before { opacity: 1; }
+.why-card:hover { transform: translateY(-4px); }
+@keyframes grad-border {
+    0%, 100% { background-position: 0% 50%; }
+    50%       { background-position: 100% 50%; }
+}
+
+/* ── FAQ smooth height transition ───────────────────────────────────────── */
+.faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.4s ease, opacity 0.3s ease;
+}
+.faq-answer.open {
+    max-height: 400px;
+    opacity: 1;
+}
+
+/* ── Sectors marquee ─────────────────────────────────────────────────────── */
+.sectors-wrap {
+    overflow: hidden;
+    width: 100%;
+    padding: 4px 0;
+    -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+    mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+}
+.sectors-track {
+    display: inline-flex;
+    animation: marquee 22s linear infinite;
+    white-space: nowrap;
+}
+.sectors-track:hover { animation-play-state: paused; }
+.sector-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 36px;
+    color: rgba(255,255,255,0.82);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    border-right: 1px solid rgba(255,255,255,0.1);
+    transition: color 0.2s ease;
+}
+.sector-item:hover { color: #fbbf24; }
+.sector-item i { color: #fbbf24; font-size: 15px; flex-shrink: 0; }
+@keyframes marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+}
 
 /* ── Category badge ─────────────────────────────────────────────────────── */
 .cat-badge {
@@ -157,4 +284,12 @@ body {
     background: #eff6ff;
     color: #1a3c5e;
     margin-bottom: 8px;
+}
+
+/* ── Reduced motion ─────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    .floating-badge, .hero-img, .sectors-track,
+    .shimmer-btn::after, .whatsapp-float::before { animation: none; }
+    .draw-underline::after { transition: none; }
+    * { transition-duration: 0.01ms !important; }
 }
