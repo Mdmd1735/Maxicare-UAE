@@ -470,9 +470,22 @@ SERVICES = [
 
 # Template for each service page
 def build_page(s):
+    # SVG checkmark items — stagger delay via CSS --i custom property
     features_html = '\n'.join(
-        f'<li class="flex items-start gap-3"><i class="fas fa-check mt-1 flex-shrink-0" style="color:#1a3c5e"></i><span>{f}</span></li>'
-        for f in s['features']
+        f'<li class="check-item flex items-start gap-3" style="--i:{i}">'
+        f'<svg class="check-svg flex-shrink-0 mt-0.5" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">'
+        f'<circle cx="12" cy="12" r="10" stroke="#1a3c5e" stroke-width="1.5" opacity="0.25"/>'
+        f'<path class="check-path" d="M5.5 12.5L9.5 16.5L18.5 7.5" stroke="#1a3c5e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>'
+        f'</svg>'
+        f'<span>{f}</span></li>'
+        for i, f in enumerate(s['features'])
+    )
+
+    # Split hero_txt on <br> for GSAP line-by-line reveal
+    hero_lines = s['hero_txt'].split('<br>')
+    hero_h1_inner = '\n'.join(
+        f'        <span class="hero-line-wrap"><span class="hero-word">{line}</span></span>'
+        for line in hero_lines
     )
 
     return f'''<!DOCTYPE html>
@@ -530,6 +543,68 @@ def build_page(s):
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+    /* ── SVG checkmark draw ─────────────────────────────────────────── */
+    .check-svg .check-path {{
+        stroke-dasharray: 30;
+        stroke-dashoffset: 30;
+        transition: stroke-dashoffset 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+    }}
+    .check-item.visible .check-path {{ stroke-dashoffset: 0; }}
+
+    /* ── Check-item slide from left ─────────────────────────────────── */
+    .check-item {{
+        opacity: 0;
+        transform: translateX(-20px);
+        transition:
+            opacity  0.45s ease calc(var(--i) * 80ms),
+            transform 0.45s ease calc(var(--i) * 80ms);
+    }}
+    .check-item.visible {{ opacity: 1; transform: translateX(0); }}
+
+    /* ── Hero category tag fade-up ──────────────────────────────────── */
+    .hero-tag {{
+        opacity: 0;
+        transform: translateY(8px);
+        transition: opacity 0.6s ease 0.1s, transform 0.6s ease 0.1s;
+    }}
+    .hero-tag.visible {{ opacity: 1; transform: translateY(0); }}
+
+    /* ── Why MaxiCare border-left draw ──────────────────────────────── */
+    .why-block {{
+        position: relative;
+        padding-left: 1.25rem;
+    }}
+    .why-block::before {{
+        content: '';
+        position: absolute;
+        left: 0; top: 0;
+        width: 4px; height: 100%;
+        background: linear-gradient(to bottom, #d97706, #1a3c5e);
+        border-radius: 2px;
+        transform: scaleY(0);
+        transform-origin: top center;
+        transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.1s;
+    }}
+    .why-block.visible::before {{ transform: scaleY(1); }}
+
+    /* ── CTA background pulse ───────────────────────────────────────── */
+    @keyframes ctaPulse {{
+        0%, 100% {{ background-position: 0% 50%; }}
+        50%       {{ background-position: 100% 50%; }}
+    }}
+    .cta-section {{
+        background: linear-gradient(135deg, #f9fafb, #eff6ff, #fef3c7, #f9fafb);
+        background-size: 400% 400%;
+        animation: ctaPulse 8s ease infinite;
+    }}
+
+    @media (prefers-reduced-motion: reduce) {{
+        .check-item, .hero-tag {{ transition: none; }}
+        .why-block::before {{ transition: none; }}
+        .cta-section {{ animation: none; background: #f9fafb; }}
+    }}
+    </style>
 </head>
 <body class="bg-white text-[#1a1a1a]">
 
@@ -565,9 +640,11 @@ def build_page(s):
         </div>
 
         <!-- Page Hero -->
-        <section class="py-20 px-4 text-center" style="background:#1a3c5e">
-            <p class="text-amber-300 text-sm font-bold tracking-[0.3em] uppercase mb-3">{s['cat']}</p>
-            <h1 class="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter mb-3">{s['name']}</h1>
+        <section class="py-20 px-4 text-center overflow-hidden" style="background:#1a3c5e">
+            <p class="hero-tag text-amber-300 text-sm font-bold tracking-[0.3em] uppercase mb-3">{s['cat']}</p>
+            <h1 class="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter mb-3 leading-tight">
+{hero_h1_inner}
+            </h1>
             <p class="text-blue-200 text-lg mb-8 max-w-xl mx-auto">{s['tagline']}</p>
             <a href="../index.html#contact" class="inline-flex items-center gap-3 bg-white px-8 py-4 rounded-full font-bold text-sm uppercase tracking-widest hover:bg-amber-50 transition-colors duration-200" style="color:#1a3c5e">
                 Get a Free Quote <i class="fas fa-arrow-right text-xs"></i>
@@ -587,7 +664,7 @@ def build_page(s):
                             </div>
                             <p class="text-sm font-bold" style="color:#1a3c5e">{s['badge']}</p>
                         </div>
-                        <div class="mt-8 p-5 rounded-2xl bg-amber-50 border border-amber-100">
+                        <div class="why-block mt-8 p-5 rounded-2xl bg-amber-50 border border-amber-100">
                             <h4 class="text-xs font-black uppercase tracking-widest text-amber-800 mb-3">Why MaxiCare for This Service</h4>
                             <p class="text-sm text-amber-900 leading-relaxed">{s['why']}</p>
                         </div>
@@ -603,7 +680,7 @@ def build_page(s):
         </section>
 
         <!-- Contact CTA -->
-        <section class="py-16 px-4 bg-gray-50 text-center">
+        <section class="cta-section py-16 px-4 text-center">
             <h2 class="text-3xl font-black uppercase mb-4">Ready to Book?</h2>
             <p class="text-gray-500 text-sm mb-8 max-w-md mx-auto">Call or WhatsApp MaxiCare now for a free, no-obligation quote on {s['name'].lower()} across Dubai, Abu Dhabi and Sharjah.</p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
@@ -630,6 +707,30 @@ def build_page(s):
             <p class="text-gray-400 text-xs">Toll Free: 8002012 &nbsp;|&nbsp; <a href="mailto:info@maxicareme.com" class="hover:text-amber-400 transition-colors duration-200">info@maxicareme.com</a></p>
         </div>
     </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script>
+    // Hero: category tag fade-up
+    document.querySelector('.hero-tag').classList.add('visible');
+
+    // Hero H1: GSAP line reveal
+    gsap.fromTo('.hero-word',
+        {{ yPercent: 110, opacity: 0 }},
+        {{ yPercent: 0, opacity: 1, duration: 0.9, ease: 'power3.out', stagger: 0.15, delay: 0.2 }}
+    );
+
+    // Scroll-triggered: check items + why block
+    const io = new IntersectionObserver((entries) => {{
+        entries.forEach(e => {{
+            if (e.isIntersecting) {{
+                e.target.classList.add('visible');
+                io.unobserve(e.target);
+            }}
+        }});
+    }}, {{ threshold: 0.12 }});
+
+    document.querySelectorAll('.check-item, .why-block').forEach(el => io.observe(el));
+    </script>
 
 </body>
 </html>'''
